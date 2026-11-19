@@ -1094,7 +1094,7 @@ try {
                 ':producto_id' => $productoId,
             ]);
             $conexion->commit();
-            respuestaJson(201, ['mensaje' => 'Compra registrada.', 'pedido_id' => $pedidoId]);
+            respuestaJson(201, ['mensaje' => 'Comprado con éxito.', 'pedido_id' => $pedidoId, 'cantidad_stock' => $restante]);
 
         case 'finalizar_compra':
             $conexion->beginTransaction();
@@ -1172,7 +1172,7 @@ try {
             $conexion->prepare('DELETE FROM articulos_carrito WHERE carrito_id = :carrito_id')
                 ->execute([':carrito_id' => $carritoId]);
             $conexion->commit();
-            respuestaJson(201, ['mensaje' => 'Compra registrada.', 'pedido_id' => $pedidoId]);
+            respuestaJson(201, ['mensaje' => 'Comprado con éxito.', 'pedido_id' => $pedidoId]);
 
         case 'eliminar_usuario':
             if (!$esAdministrador) {

@@ -822,6 +822,14 @@ const cargarPerfil = async () => {
 };
 
 //Tienda y carrito
+let filtroProductos = "";
+const alternarFormularioVenta = () => {
+    const panel = document.getElementById("formulario-venta");
+    const oculto = panel.classList.toggle("no-mostrar");
+    document.getElementById("vender-producto").setAttribute("aria-expanded", String(!oculto));
+    if (!oculto) panel.scrollIntoView({ block: "start" });
+};
+
 const iniciarTienda = () => {
     if (!document.querySelector(".tienda")) return;
     const botonCarrito = crearBoton("boton-global boton-carrito", "Ver carrito");
@@ -835,15 +843,14 @@ const iniciarTienda = () => {
             await llamarApi("publicar_producto", { method: "POST", body: new FormData(formulario) });
             formulario.reset();
             document.querySelector(".tienda__publicar").classList.add("no-mostrar");
+            document.getElementById("vender-producto").setAttribute("aria-expanded", "false");
             await cargarProductos();
             notificar("Artículo publicado.");
         } catch (error) {
             notificar(error.message, true);
         }
     });
-    document.getElementById("vender-producto")?.addEventListener("click", () => {
-        document.querySelector(".tienda__publicar")?.classList.toggle("no-mostrar");
-    });
+    document.getElementById("vender-producto")?.addEventListener("click", alternarFormularioVenta);
     document.querySelectorAll(".tienda__categorias button").forEach((boton) => {
         boton.addEventListener("click", () => {
             const nombre = boton.querySelector("img")?.alt;
@@ -854,9 +861,10 @@ const iniciarTienda = () => {
     actualizarContadorCarrito();
 };
 
-const cargarProductos = async (plataforma = "") => {
+const cargarProductos = async (plataforma = filtroProductos) => {
     const contenedor = document.querySelector(".contenedor-tienda");
     if (!contenedor) return;
+    filtroProductos = plataforma;
     try {
         const datos = await llamarApi("productos", { params: { plataforma } });
         contenedor.replaceChildren();
@@ -937,6 +945,8 @@ const mostrarCarrito = async () => {
         const total = crearElemento("p", "carrito-modal__total");
         const comprar = crearBoton("boton-global", "Finalizar compra");
         comprar.addEventListener("click", async () => {
+            if (comprar.disabled) return;
+            comprar.disabled = true;
             try {
                 const resultado = await llamarApi("finalizar_compra", { method: "POST", body: {} });
                 dialogo.close();
@@ -944,6 +954,7 @@ const mostrarCarrito = async () => {
                 await Promise.all([actualizarContadorCarrito(), cargarProductos()]);
             } catch (error) {
                 notificar(error.message, true);
+                comprar.disabled = false;
             }
         });
         dialogo.append(cabecera, lista, total, comprar);
@@ -987,15 +998,23 @@ const mostrarCarrito = async () => {
 //Detalle del producto
 const iniciarProducto = async () => {
     if (!document.querySelector(".producto")) return;
+    const seccion = document.querySelector(".contenedor-producto");
+    const mostrarNoDisponible = (mensaje) => {
+        seccion.replaceChildren(crearElemento("p", "feed-vacio", mensaje));
+        seccion.hidden = false;
+    };
     const params = new URLSearchParams(window.location.search);
     const productoId = params.get("producto_id");
     if (!productoId) {
-        notificar("Selecciona un artículo desde la tienda.", true);
+        mostrarNoDisponible("Selecciona un artículo desde la tienda.");
         return;
     }
     try {
         const { producto } = await llamarApi("producto", { params: { producto_id: productoId } });
-        const seccion = document.querySelector(".contenedor-producto");
+        if (producto.estado_producto !== "disponible" || Number(producto.cantidad_stock) <= 0) {
+            mostrarNoDisponible("Este artículo ya no está disponible.");
+            return;
+        }
         const datos = seccion.children[1];
         const compra = seccion.querySelector(".contenedor-producto__barra-compra");
         const imagen = seccion.querySelector("img");
@@ -1005,15 +1024,20 @@ const iniciarProducto = async () => {
         datos.querySelector(".contenedor-producto__vendedor span").textContent = producto.vendedor_gamertag;
         datos.querySelector(".contenedor-producto__precio").textContent = `${producto.codigo_moneda} $${Number(producto.precio).toFixed(2)}`;
         datos.querySelectorAll("p")[3].textContent = producto.descripcion;
-        compra.querySelector(".contenedor-producto__vendedor-venderdor").textContent = `Disponible · ${producto.cantidad_stock} unidades`;
         const selector = compra.querySelector("select");
-        selector.replaceChildren();
-        for (let cantidad = 1; cantidad <= Math.min(10, Number(producto.cantidad_stock)); cantidad++) {
-            selector.append(new Option(String(cantidad), String(cantidad)));
-        }
+        const actualizarCantidad = (stock) => {
+            compra.querySelector(".contenedor-producto__vendedor-venderdor").textContent = `Disponible · ${stock} unidades`;
+            selector.replaceChildren();
+            for (let cantidad = 1; cantidad <= Math.min(10, Number(stock)); cantidad++) {
+                selector.append(new Option(String(cantidad), String(cantidad)));
+            }
+        };
+        actualizarCantidad(producto.cantidad_stock);
         const cantidadActual = () => Number(selector.value || 1);
-        compra.querySelectorAll("button").forEach((boton, indice) => {
+        const botones = compra.querySelectorAll("button");
+        botones.forEach((boton, indice) => {
             boton.addEventListener("click", async () => {
+                botones.forEach((control) => { control.disabled = true; });
                 try {
                     const accion = indice === 0 ? "comprar" : "agregar_carrito";
                     const resultado = await llamarApi(accion, {
@@ -1021,12 +1045,23 @@ const iniciarProducto = async () => {
                         body: { producto_id: producto.producto_id, cantidad: cantidadActual() },
                     });
                     notificar(resultado.mensaje);
+                    if (accion === "comprar") {
+                        if (Number(resultado.cantidad_stock) === 0) {
+                            mostrarNoDisponible("Este artículo ya no está disponible.");
+                        } else {
+                            actualizarCantidad(resultado.cantidad_stock);
+                        }
+                    }
                 } catch (error) {
                     notificar(error.message, true);
+                } finally {
+                    botones.forEach((control) => { control.disabled = false; });
                 }
             });
         });
+        seccion.hidden = false;
     } catch (error) {
+        mostrarNoDisponible("No se pudo cargar el artículo.");
         notificar(error.message, true);
     }
 };
@@ -1105,6 +1140,26 @@ const iniciarEscuadrones = () => {
         }
     });
 
+    const formularioChat = document.querySelector(".escuadrones__chat-input");
+    formularioChat?.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const campo = formularioChat.querySelector("input");
+        const boton = formularioChat.querySelector("button");
+        const id = sessionStorage.getItem("escuadron_actual");
+        const contenido = campo.value.trim();
+        if (!id || !contenido || boton.disabled) return;
+        boton.disabled = true;
+        try {
+            await llamarApi("mensaje_escuadron", { method: "POST", body: { escuadron_id: id, contenido } });
+            if (campo.value.trim() === contenido) campo.value = "";
+            if (sessionStorage.getItem("escuadron_actual") === id) await cargarMensajesEscuadron(id);
+        } catch (error) {
+            notificar(error.message, true);
+        } finally {
+            boton.disabled = false;
+        }
+    });
+
     const formulario = document.querySelector(".escuadrones__form");
     formulario?.addEventListener("submit", async (evento) => {
         evento.preventDefault();
@@ -1121,7 +1176,7 @@ const iniciarEscuadrones = () => {
     if (idInicial) {
         llamarApi("escuadrones").then(({ escuadrones }) => {
             const actual = escuadrones.find((escuadron) => String(escuadron.escuadron_id) === idInicial);
-            if (actual && Number(actual.soy_miembro)) abrirCanalEscuadron(actual);
+            if (actual && Number(actual.soy_miembro)) return abrirCanalEscuadron(actual);
             else actualizarLista();
         }).catch((error) => notificar(error.message, true));
     } else {
@@ -1163,6 +1218,7 @@ const cargarMensajesEscuadron = async (escuadronId) => {
             item.append(inicial, contenido);
             chat.append(item);
         });
+        chat.scrollTop = chat.scrollHeight;
     } catch (error) {
         notificar(error.message, true);
     }
@@ -1284,23 +1340,31 @@ const iniciarChat = async () => {
     busqueda.setAttribute("aria-label", "Buscar jugadores");
     barra.prepend(busqueda);
     const panel = document.querySelector(".chat__contenido");
-    const mostrarMensajes = async (conversacionId, nombre, urlAvatar = "") => {
+    let conversacionActual = null;
+    let solicitudMensajes = 0;
+    const cargarMensajes = async (conversacionId) => {
+        const solicitud = ++solicitudMensajes;
         try {
-            panel.classList.remove("chat__contenido-switch")
             const datos = await llamarApi("mensajes", { params: { conversacion_id: conversacionId } });
+            if (solicitud !== solicitudMensajes) return;
             panel.replaceChildren();
             datos.mensajes.forEach((mensaje) => {
                 const item = crearElemento("div", `mensaje-directo${Number(mensaje.remitente_usuario_id) === Number(usuarioActual.usuario_id) ? " mensaje-directo--propio" : " mensaje-directo--amigo"}`);
                 item.append(crearElemento("strong", "", mensaje.gamertag), crearElemento("p", "", mensaje.contenido));
                 panel.append(item);
             });
-            document.querySelector(".chat__info p:first-child").textContent = nombre;
-            const imagenConversacion = document.querySelector(".chat__imagen");
-            if (urlAvatar) imagenConversacion.style.backgroundImage = `url("${encodeURI(urlAvatar)}")`;
-            document.querySelector(".chat__input").dataset.conversacionId = conversacionId;
+            panel.scrollTop = panel.scrollHeight;
         } catch (error) {
-            notificar(error.message, true);
+            if (solicitud === solicitudMensajes) notificar(error.message, true);
         }
+    };
+    const mostrarMensajes = (conversacionId, nombre, urlAvatar) => {
+        conversacionActual = String(conversacionId);
+        panel.classList.remove("chat__contenido-switch");
+        panel.replaceChildren();
+        document.querySelector(".chat__info p:first-child").textContent = nombre;
+        document.querySelector(".chat__imagen").style.backgroundImage = urlAvatar ? `url("${encodeURI(urlAvatar)}")` : "";
+        return cargarMensajes(conversacionId);
     };
     const cargarConversaciones = async () => {
         const datos = await llamarApi("conversaciones");
@@ -1391,14 +1455,21 @@ const iniciarChat = async () => {
 
     const enviar = async () => {
         const campo = document.querySelector(".chat__input input");
-        const conversacionId = document.querySelector(".chat__input").dataset.conversacionId;
-        if (!conversacionId || !campo.value.trim()) return;
+        const boton = document.querySelector(".chat__input button");
+        const conversacionId = conversacionActual;
+        const contenido = campo.value.trim();
+        if (!conversacionId || !contenido || boton.disabled) return;
+        boton.disabled = true;
         try {
-            await llamarApi("enviar_mensaje", { method: "POST", body: { conversacion_id: conversacionId, contenido: campo.value.trim() } });
-            campo.value = "";
-            await mostrarMensajes(conversacionId, document.querySelector(".chat__info p:first-child").textContent);
+            await llamarApi("enviar_mensaje", { method: "POST", body: { conversacion_id: conversacionId, contenido } });
+            if (conversacionActual === conversacionId) {
+                if (campo.value.trim() === contenido) campo.value = "";
+                await cargarMensajes(conversacionId);
+            }
         } catch (error) {
             notificar(error.message, true);
+        } finally {
+            boton.disabled = false;
         }
     };
     document.querySelector(".chat__input button")?.addEventListener("click", enviar);
@@ -1425,27 +1496,59 @@ const iniciarChat = async () => {
 // Vista previa sin cuenta
 const configurarVistaPrevia = () => {
     document.body.classList.add("vista-previa");
+    const aviso = crearElemento("div", "vista-previa__aviso", "Vista previa sin contenido · ");
+    const acceso = crearElemento("a", "", "Iniciar sesión");
+    acceso.href = "index.php";
+    aviso.append(acceso);
+    document.querySelector(".barra-superior")?.after(aviso);
+
+    document.querySelectorAll('a[href$=".html"]').forEach((enlace) => {
+        const url = new URL(enlace.href);
+        url.searchParams.set("preview", "1");
+        enlace.href = url.href;
+    });
+
+    crearCompositor();
+    const feed = document.querySelector(".muro__posts section") || document.querySelector(".posts");
+    if (feed) feed.append(crearElemento("p", "feed-vacio", "No hay publicaciones en la vista previa."));
+
+    const videojuegos = document.querySelector(".videojuegos");
+    if (videojuegos) {
+        videojuegos.innerHTML = '<div class="videojuegos__plataformas"><h3>Mis plataformas favoritas</h3></div><div class="videojuegos__plataformas"><h3>Mis juegos favoritos</h3></div>';
+    }
+
+    const productos = document.querySelector(".contenedor-tienda");
+    if (productos) productos.append(crearElemento("p", "feed-vacio", "No hay artículos en la vista previa."));
+    const detalleProducto = document.querySelector(".contenedor-producto");
+    if (detalleProducto) {
+        detalleProducto.replaceChildren(crearElemento("p", "feed-vacio", "No hay ningún artículo seleccionado."));
+        detalleProducto.hidden = false;
+    }
+    const listaEscuadrones = document.querySelector(".escuadrones__lista");
+    if (listaEscuadrones) {
+        listaEscuadrones.append(crearElemento("p", "feed-vacio", "No hay escuadras en la vista previa."));
+        document.querySelector(".escuadrones__contador").textContent = "0 disponibles";
+    }
+
     document.querySelectorAll("button, input, select, textarea").forEach((control) => {
-        if (control.closest(".barra-superior__busqueda")) return;
         control.disabled = true;
     });
+    const habilitarBoton = (selector, accion) => {
+        const boton = document.querySelector(selector);
+        if (!boton) return;
+        boton.disabled = false;
+        boton.addEventListener("click", accion);
+    };
+    habilitarBoton("#boton-mensaje", () => { window.location.href = "chat.html?preview=1"; });
+    habilitarBoton("#boton-salir", () => { window.location.href = "index.php"; });
+    habilitarBoton("#crear-escuadron", () => { window.location.href = "crear-escuadron.html?preview=1"; });
+    habilitarBoton("#vender-producto", alternarFormularioVenta);
 };
 
 // Inicio de la aplicación
 const iniciarAplicacion = async () => {
     if (modoVistaPrevia) {
         configurarVistaPrevia();
-        try {
-            prepararBusquedaGlobal();
-            crearCompositor();
-            await Promise.all([cargarPerfil(), cargarFeed()]);
-            iniciarTienda();
-            iniciarEscuadrones();
-            await iniciarProducto();
-            configurarVistaPrevia();
-        } catch (error) {
-            notificar(error.message, true);
-        }
         return;
     }
     try {
