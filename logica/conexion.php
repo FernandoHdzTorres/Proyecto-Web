@@ -1,10 +1,10 @@
 <?php
 
-$host = 'localhost';
-$dbname = 'gamerbook';
-$username = 'root';
-$password = 'root';
-$port = '8889';
+$host     = getenv('MYSQLHOST') ?: 'localhost';
+$dbname   = getenv('MYSQLDATABASE') ?: 'gamerbook';
+$username = getenv('MYSQLUSER') ?: 'root';
+$password = getenv('MYSQLPASSWORD') ?: 'root';
+$port     = getenv('MYSQLPORT') ?: '8889';
 $charset = 'utf8mb4';
 $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=$charset";
 
@@ -14,3 +14,4 @@ try {
 } catch (PDOException $e) {
     error_log('Gamerbook database connection failed: ' . $e->getMessage());
 }
+?>
