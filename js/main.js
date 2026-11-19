@@ -222,11 +222,27 @@ const prepararBarra = () => {
         botonNotificaciones.setAttribute("aria-label", "Notificaciones");
         botonNotificaciones.setAttribute("aria-controls", panel.id);
         botonNotificaciones.setAttribute("aria-expanded", "false");
+        const indicador = crearElemento("span", "notificaciones-contador");
+        indicador.hidden = true;
+        indicador.setAttribute("aria-hidden", "true");
+        botonNotificaciones.append(indicador);
         botonNotificaciones.parentElement.append(panel);
 
+        let consultando = false;
+        let errorNotificaciones = false;
         const cargarNotificaciones = async () => {
+            if (consultando) return;
+            consultando = true;
             try {
                 const datos = await llamarApi("notificaciones");
+                let noLeidas = Number(datos.no_leidas);
+                if (botonNotificaciones.getAttribute("aria-expanded") !== "true") {
+                    indicador.hidden = noLeidas === 0;
+                    indicador.textContent = noLeidas > 99 ? "99+" : String(noLeidas);
+                    botonNotificaciones.setAttribute("aria-label", noLeidas ? `Notificaciones: ${noLeidas} sin leer` : "Notificaciones");
+                    errorNotificaciones = false;
+                    return;
+                }
                 const titulo = crearElemento("h2", "", "Notificaciones");
                 const lista = crearElemento("ul", "ventana-notificaciones__lista");
                 if (!datos.notificaciones.length) {
@@ -242,6 +258,13 @@ const prepararBarra = () => {
                         const abrir = crearBoton("ventana-notificaciones__accion", "Abrir mensaje");
                         abrir.addEventListener("click", () => {
                             window.location.href = `chat.html?conversacion=${notificacion.conversacion_id}`;
+                        });
+                        item.append(abrir);
+                    }
+                    if (notificacion.escuadron_id) {
+                        const abrir = crearBoton("ventana-notificaciones__accion", "Abrir escuadrón");
+                        abrir.addEventListener("click", () => {
+                            window.location.href = `escuadrones.html?escuadron=${encodeURIComponent(notificacion.escuadron_id)}`;
                         });
                         item.append(abrir);
                     }
@@ -266,12 +289,25 @@ const prepararBarra = () => {
                     lista.append(item);
                 });
                 panel.replaceChildren(titulo, lista);
-                await llamarApi("marcar_notificaciones", { method: "POST", body: {} });
+                const ids = datos.notificaciones.filter((notificacion) => !notificacion.leido_en).map((notificacion) => notificacion.notificacion_id);
+                if (ids.length) {
+                    await llamarApi("marcar_notificaciones", { method: "POST", body: { ids } });
+                    noLeidas = Math.max(0, noLeidas - ids.length);
+                }
+                indicador.hidden = noLeidas === 0;
+                indicador.textContent = noLeidas > 99 ? "99+" : String(noLeidas);
+                botonNotificaciones.setAttribute("aria-label", noLeidas ? `Notificaciones: ${noLeidas} sin leer` : "Notificaciones");
+                errorNotificaciones = false;
             } catch (error) {
-                notificar(error.message, true);
+                if (!errorNotificaciones) notificar(error.message, true);
+                errorNotificaciones = true;
+            } finally {
+                consultando = false;
             }
         };
 
+        cargarNotificaciones();
+        window.setInterval(cargarNotificaciones, 15000);
         botonNotificaciones.addEventListener("click", async () => {
             const mostrar = botonNotificaciones.getAttribute("aria-expanded") !== "true";
             panel.classList.toggle("no-mostrar", !mostrar);
@@ -1152,13 +1188,25 @@ const iniciarEscuadrones = () => {
         try {
             await llamarApi("mensaje_escuadron", { method: "POST", body: { escuadron_id: id, contenido } });
             if (campo.value.trim() === contenido) campo.value = "";
-            if (sessionStorage.getItem("escuadron_actual") === id) await cargarMensajesEscuadron(id);
+            if (sessionStorage.getItem("escuadron_actual") === id) await cargarMensajesEscuadron(id, true);
         } catch (error) {
             notificar(error.message, true);
         } finally {
             boton.disabled = false;
         }
     });
+
+    let actualizandoCanal = false;
+    if (lista) window.setInterval(async () => {
+        const id = sessionStorage.getItem("escuadron_actual");
+        if (!id || document.hidden || actualizandoCanal || document.querySelector(".canal-flag").classList.contains("no-mostrar")) return;
+        actualizandoCanal = true;
+        try {
+            await cargarMensajesEscuadron(id);
+        } finally {
+            actualizandoCanal = false;
+        }
+    }, 15000);
 
     const formulario = document.querySelector(".escuadrones__form");
     formulario?.addEventListener("submit", async (evento) => {
@@ -1198,18 +1246,31 @@ const abrirCanalEscuadron = async (escuadron) => {
     document.querySelector(".canal-flag")?.classList.remove("no-mostrar");
     document.querySelector("#canal-titulo").textContent = escuadron.nombre;
     document.querySelector(".escuadrones__canal-juego").textContent = escuadron.juego;
-    await cargarMensajesEscuadron(escuadron.escuadron_id);
+    await cargarMensajesEscuadron(escuadron.escuadron_id, true);
 };
 
-const cargarMensajesEscuadron = async (escuadronId) => {
+let solicitudCanal = 0;
+let errorCanal = false;
+const cargarMensajesEscuadron = async (escuadronId, bajarAlFinal = false) => {
     const chat = document.querySelector(".escuadrones__chat");
     if (!chat) return;
+    const solicitud = ++solicitudCanal;
     try {
         const datos = await llamarApi("mensajes_escuadron", { params: { escuadron_id: escuadronId } });
+        if (solicitud !== solicitudCanal || sessionStorage.getItem("escuadron_actual") !== String(escuadronId)
+            || document.querySelector(".canal-flag").classList.contains("no-mostrar")) return;
+        errorCanal = false;
+        const seguirAlFinal = bajarAlFinal || chat.scrollHeight - chat.scrollTop - chat.clientHeight < 50;
+        const posicion = chat.scrollTop;
         chat.replaceChildren();
         datos.mensajes.forEach((mensaje) => {
             const item = crearElemento("div", "escuadrones__mensaje-chat");
-            const inicial = crearElemento("span", "escuadrones__avatar escuadrones__avatar--cyan", mensaje.nombre.slice(0, 1));
+            const inicial = crearElemento("span", "escuadrones__avatar escuadrones__avatar--cyan", mensaje.url_avatar ? "" : mensaje.nombre.slice(0, 1));
+            if (mensaje.url_avatar) {
+                inicial.style.backgroundImage = `url("${encodeURI(mensaje.url_avatar)}")`;
+                inicial.setAttribute("role", "img");
+                inicial.setAttribute("aria-label", `Foto de ${mensaje.gamertag}`);
+            }
             const contenido = crearElemento("div");
             contenido.append(
                 crearElemento("strong", "", `${mensaje.gamertag} · ${formatoFecha(mensaje.creado_en)}`),
@@ -1218,9 +1279,12 @@ const cargarMensajesEscuadron = async (escuadronId) => {
             item.append(inicial, contenido);
             chat.append(item);
         });
-        chat.scrollTop = chat.scrollHeight;
+        chat.scrollTop = seguirAlFinal ? chat.scrollHeight : posicion;
     } catch (error) {
-        notificar(error.message, true);
+        if (solicitud === solicitudCanal) {
+            if (!errorCanal) notificar(error.message, true);
+            errorCanal = true;
+        }
     }
 };
 

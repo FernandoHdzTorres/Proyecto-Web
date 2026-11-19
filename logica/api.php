@@ -220,6 +220,7 @@ try {
                      LEFT JOIN miembros_escuadron m ON m.escuadron_id = e.escuadron_id
                      WHERE e.estado_escuadron IN ('abierto', 'lleno')
                      GROUP BY e.escuadron_id
+                     HAVING miembros > 0
                      ORDER BY e.creado_en DESC LIMIT 100"
                 );
                 $stmt->execute([':usuario_id' => $usuarioId]);
@@ -326,10 +327,11 @@ try {
                     'SELECT n.notificacion_id, n.tipo_notificacion, n.mensaje, n.creado_en, n.leido_en,
                             n.actor_usuario_id, n.mensaje_directo_id,
                             p.gamertag AS actor,
-                            md.conversacion_id,
+                            md.conversacion_id, COALESCE(n.escuadron_id, me.escuadron_id) AS escuadron_id,
                             a.estado_amistad
                      FROM notificaciones n LEFT JOIN perfiles p ON p.usuario_id = n.actor_usuario_id
                      LEFT JOIN mensajes_directos md ON md.mensaje_id = n.mensaje_directo_id
+                     LEFT JOIN mensajes_escuadron me ON me.mensaje_escuadron_id = n.mensaje_escuadron_id
                      LEFT JOIN amistades a
                        ON n.actor_usuario_id IS NOT NULL
                       AND a.usuario_menor_id = LEAST(n.destinatario_usuario_id, n.actor_usuario_id)
@@ -338,7 +340,10 @@ try {
                      ORDER BY n.creado_en DESC LIMIT 50'
                 );
                 $stmt->execute([':usuario_id' => $usuarioId]);
-                respuestaJson(200, ['notificaciones' => $stmt->fetchAll()]);
+                $notificaciones = $stmt->fetchAll();
+                $stmt = $conexion->prepare('SELECT COUNT(*) FROM notificaciones WHERE destinatario_usuario_id = :usuario_id AND leido_en IS NULL');
+                $stmt->execute([':usuario_id' => $usuarioId]);
+                respuestaJson(200, ['notificaciones' => $notificaciones, 'no_leidas' => (int)$stmt->fetchColumn()]);
 
             case 'conversaciones':
                 $stmt = $conexion->prepare(
@@ -755,16 +760,46 @@ try {
                 respuestaJson(422, ['error' => 'La escuadra no es válida.']);
             }
             $conexion->beginTransaction();
+            $stmt = $conexion->prepare('SELECT escuadron_id FROM escuadrones WHERE escuadron_id = :id FOR UPDATE');
+            $stmt->execute([':id' => $escuadronId]);
+            if (!$stmt->fetchColumn()) {
+                $conexion->rollBack();
+                respuestaJson(404, ['error' => 'La escuadra ya no existe.']);
+            }
             $stmt = $conexion->prepare(
                 "UPDATE miembros_escuadron SET estado_membresia = 'salio', salio_en = CURRENT_TIMESTAMP
                  WHERE escuadron_id = :escuadron_id AND usuario_id = :usuario_id AND estado_membresia = 'activo'"
             );
             $stmt->execute([':escuadron_id' => $escuadronId, ':usuario_id' => $usuarioId]);
+            if ($stmt->rowCount() === 0) {
+                $conexion->rollBack();
+                respuestaJson(403, ['error' => 'No perteneces a esta escuadra.']);
+            }
             $stmt = $conexion->prepare(
-                "UPDATE escuadrones SET estado_escuadron = 'abierto'
-                 WHERE escuadron_id = :escuadron_id AND estado_escuadron = 'lleno'"
+                "SELECT COUNT(*) FROM miembros_escuadron
+                 WHERE escuadron_id = :escuadron_id AND estado_membresia = 'activo'"
             );
             $stmt->execute([':escuadron_id' => $escuadronId]);
+            if ((int)$stmt->fetchColumn() === 0) {
+                $stmt = $conexion->prepare(
+                    'DELETE FROM notificaciones WHERE escuadron_id = :escuadron_id
+                     OR mensaje_escuadron_id IN
+                        (SELECT mensaje_escuadron_id FROM mensajes_escuadron WHERE escuadron_id = :mensajes_escuadron_id)'
+                );
+                $stmt->execute([':escuadron_id' => $escuadronId, ':mensajes_escuadron_id' => $escuadronId]);
+                $stmt = $conexion->prepare('DELETE FROM mensajes_escuadron WHERE escuadron_id = :escuadron_id');
+                $stmt->execute([':escuadron_id' => $escuadronId]);
+                $stmt = $conexion->prepare('DELETE FROM miembros_escuadron WHERE escuadron_id = :escuadron_id');
+                $stmt->execute([':escuadron_id' => $escuadronId]);
+                $stmt = $conexion->prepare('DELETE FROM escuadrones WHERE escuadron_id = :escuadron_id');
+                $stmt->execute([':escuadron_id' => $escuadronId]);
+            } else {
+                $stmt = $conexion->prepare(
+                    "UPDATE escuadrones SET estado_escuadron = 'abierto'
+                     WHERE escuadron_id = :escuadron_id AND estado_escuadron = 'lleno'"
+                );
+                $stmt->execute([':escuadron_id' => $escuadronId]);
+            }
             $conexion->commit();
             respuestaJson(200, ['mensaje' => 'Saliste de la escuadra.']);
 
@@ -774,12 +809,20 @@ try {
             if (!$escuadronId) {
                 respuestaJson(422, ['error' => 'La escuadra no es válida.']);
             }
+            $conexion->beginTransaction();
+            $stmt = $conexion->prepare('SELECT escuadron_id FROM escuadrones WHERE escuadron_id = :id FOR UPDATE');
+            $stmt->execute([':id' => $escuadronId]);
+            if (!$stmt->fetchColumn()) {
+                $conexion->rollBack();
+                respuestaJson(404, ['error' => 'La escuadra ya no existe.']);
+            }
             $stmt = $conexion->prepare(
                 "SELECT 1 FROM miembros_escuadron
                  WHERE escuadron_id = :escuadron_id AND usuario_id = :usuario_id AND estado_membresia = 'activo'"
             );
             $stmt->execute([':escuadron_id' => $escuadronId, ':usuario_id' => $usuarioId]);
             if (!$stmt->fetchColumn()) {
+                $conexion->rollBack();
                 respuestaJson(403, ['error' => 'Debes pertenecer a la escuadra para escribir en el canal.']);
             }
             $stmt = $conexion->prepare(
@@ -791,6 +834,16 @@ try {
                 ':usuario_id' => $usuarioId,
                 ':contenido' => $contenido,
             ]);
+            $mensajeId = (int)$conexion->lastInsertId();
+            $stmt = $conexion->prepare(
+                "SELECT usuario_id FROM miembros_escuadron
+                 WHERE escuadron_id = :escuadron_id AND estado_membresia = 'activo' AND usuario_id <> :usuario_id"
+            );
+            $stmt->execute([':escuadron_id' => $escuadronId, ':usuario_id' => $usuarioId]);
+            foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $destinatarioId) {
+                crearNotificacion($conexion, (int)$destinatarioId, $usuarioId, 'mensaje', 'Envió un mensaje en tu escuadra.', 'mensaje_escuadron_id', $mensajeId);
+            }
+            $conexion->commit();
             respuestaJson(201, ['mensaje' => 'Mensaje enviado.']);
 
         case 'abrir_conversacion':
@@ -1281,11 +1334,26 @@ try {
             respuestaJson(200, ['mensaje' => 'Consola eliminada del catálogo y de todos los perfiles.']);
 
         case 'marcar_notificaciones':
-            $stmt = $conexion->prepare(
-                'UPDATE notificaciones SET leido_en = CURRENT_TIMESTAMP
-                 WHERE destinatario_usuario_id = :usuario_id AND leido_en IS NULL'
-            );
-            $stmt->execute([':usuario_id' => $usuarioId]);
+            if (isset($entrada['ids'])) {
+                $ids = $entrada['ids'];
+                if (!is_array($ids) || count($ids) > 50 || array_filter($ids, static fn($id) => !filter_var($id, FILTER_VALIDATE_INT) || (int)$id < 1)) {
+                    respuestaJson(422, ['error' => 'Las notificaciones no son válidas.']);
+                }
+                if ($ids) {
+                    $marcadores = implode(',', array_fill(0, count($ids), '?'));
+                    $stmt = $conexion->prepare(
+                        "UPDATE notificaciones SET leido_en = CURRENT_TIMESTAMP
+                         WHERE destinatario_usuario_id = ? AND leido_en IS NULL AND notificacion_id IN ($marcadores)"
+                    );
+                    $stmt->execute([$usuarioId, ...$ids]);
+                }
+            } else {
+                $stmt = $conexion->prepare(
+                    'UPDATE notificaciones SET leido_en = CURRENT_TIMESTAMP
+                     WHERE destinatario_usuario_id = :usuario_id AND leido_en IS NULL'
+                );
+                $stmt->execute([':usuario_id' => $usuarioId]);
+            }
             respuestaJson(200, ['mensaje' => 'Notificaciones marcadas como leídas.']);
 
         default:

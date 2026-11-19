@@ -297,11 +297,13 @@ form :is(input, select, textarea):user-invalid
 .administracion
 {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
     padding: 4rem 0;
 }
 .administracion__seccion
 {
+    min-width: 0;
     padding: 2rem;
     border: 1px solid var(--gris);
     border-radius: 1.5rem;
@@ -323,6 +325,7 @@ form :is(input, select, textarea):user-invalid
 .administracion__form input
 {
     width: 100%;
+    min-width: 0;
     min-height: 4.4rem;
     padding: 1rem;
     border: 1px solid var(--gris);
@@ -356,6 +359,20 @@ form :is(input, select, textarea):user-invalid
     padding: 1.2rem;
     border: 1px solid var(--gris);
     border-radius: 1rem;
+    color: var(--gris-muy-claro);
+}
+.administracion__lista .administracion__item
+{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+.administracion__item strong,
+.administracion__item span
+{
+    overflow-wrap: anywhere;
+}
+.administracion__item strong
+{
+    color: var(--blanco);
 }
 .administracion__item img
 {
@@ -631,10 +648,25 @@ form :is(input, select, textarea):user-invalid
 }
 .barra-superior__botones button
 {
+    position: relative;
     background: transparent;
     border: none;
     border-radius: 1rem;
     padding: .5rem;
+}
+.notificaciones-contador
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 1.8rem;
+    padding: .2rem .4rem;
+    border-radius: 1rem;
+    background: var(--rosa-acento1);
+    color: var(--blanco);
+    font-size: 1rem;
+    line-height: 1.4;
+    text-align: center;
 }
 .barra-superior__botones button:hover
 {
@@ -2446,6 +2478,8 @@ form :is(input, select, textarea):user-invalid
     color: var(--blanco);
     font-size: 1.3rem;
     font-weight: 600;
+    background-position: center;
+    background-size: cover;
 }
 .escuadrones__avatar--rosa
 {
@@ -3203,6 +3237,16 @@ form :is(input, select, textarea):user-invalid
 /*MOVIL - BARRA PERFIL MURO TIENDA PRODUCTO Y ESCUADRONES*/
 @media (max-width: 600px)
 {
+    .administracion__form,
+    .administracion__lista .administracion__item
+    {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .administracion h2
+    {
+        font-size: 3.2rem;
+        overflow-wrap: anywhere;
+    }
     .barra-superior
     {
         gap: 1rem;
@@ -3291,6 +3335,16 @@ form :is(input, select, textarea):user-invalid
     {
         -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M5 21v-2a7 7 0 0 1 14 0v2'/%3E%3C/svg%3E");
         mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M5 21v-2a7 7 0 0 1 14 0v2'/%3E%3C/svg%3E");
+    }
+    .barra-superior__nav a[href^="administracion.html"]
+    {
+        font-size: 1rem;
+        overflow-wrap: anywhere;
+    }
+    .barra-superior__nav a[href^="administracion.html"]::before
+    {
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E");
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E");
     }
     .barra-superior__nav a.activo,
     .barra-superior__nav a:hover
