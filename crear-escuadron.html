@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <link rel="preload" href="css/style.css" as="style">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Gamerbook</title>
+</head>
+
+<body>
+    <header class="barra-superior">
+        <div class="barra-superior__busqueda">
+            <a href="perfil.html">
+                <h1>GB</h1>
+            </a>
+            <input type="search" placeholder="buscar en gamerbook">
+        </div>
+
+        <nav class="barra-superior__nav">
+            <a href="muro.html">Muro</a>
+            <a href="tienda.html">Tienda</a>
+            <a href="escuadrones.html">Escuadrones</a>
+            <a href="perfil.html">Perfil</a>
+        </nav>
+
+        <div class="barra-superior__botones">
+            <button id="boton-mensaje">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff"
+                    class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                </svg>
+            </button>
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff"
+                    class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                </svg>
+            </button>
+            <button id="boton-salir">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff"
+                    class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="escuadrones contenedor">
+        <a href="escuadrones.html" class="salir"><</a>
+        <section class="escuadrones__panel escuadrones__crear">
+            <div class="escuadrones__panel-titulo">
+                <div>
+                    <h3 id="crear-titulo">Crea una escuadra</h3>
+                    <p>Publica tu plan y que se sumen.</p>
+                </div>
+            </div>
+            <form class="escuadrones__form">
+                <div class="escuadrones__campo">
+                    <label for="nombre-escuadron">Nombre de la escuadra</label>
+                    <input id="nombre-escuadron" name="nombre" type="text" maxlength="32"
+                        placeholder="Ej. Los del último círculo" required>
+                </div>
+                <div class="escuadrones__campo">
+                    <label for="juego-escuadron">¿A qué jugamos?</label>
+                    <select id="juego-escuadron" name="juego" required>
+                        <option value="Apex Legends">Apex Legends</option>
+                        <option value="Valorant">Valorant</option>
+                        <option value="Fortnite">Fortnite</option>
+                        <option value="Minecraft">Minecraft</option>
+                    </select>
+                </div>
+                <div class="escuadrones__form-fila">
+                    <div class="escuadrones__campo">
+                        <label for="plataforma">Plataforma</label>
+                        <select id="plataforma" name="plataforma">
+                            <option>PC</option>
+                            <option>PlayStation</option>
+                            <option>Xbox</option>
+                            <option>Nintendo Switch</option>
+                            <option>Cualquiera</option>
+                        </select>
+                    </div>
+                    <div class="escuadrones__campo">
+                        <label for="cupo">Cupo total</label>
+                        <select id="cupo" name="cupo">
+                            <option value="2">2 jugadores</option>
+                            <option value="3">3 jugadores</option>
+                            <option value="4" selected>4 jugadores</option>
+                            <option value="5">5 jugadores</option>
+                            <option value="8">8 jugadores</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="escuadrones__campo">
+                    <label for="duracion">¿Cuánto dura el plan?</label>
+                    <select id="duracion" name="duracion">
+                        <option value="1 hora">1 hora</option>
+                        <option value="2 horas" selected>2 horas</option>
+                        <option value="Esta noche">Esta noche</option>
+                    </select>
+                </div>
+                <div class="escuadrones__campo">
+                    <label for="descripcion">¿Qué buscamos? <span>(opcional)</span></label>
+                    <textarea id="descripcion" name="descripcion" rows="3" maxlength="110"
+                        placeholder="Modo de juego, nivel, si usamos micrófono..."></textarea>
+                </div>
+                <button class="escuadrones__boton escuadrones__boton--primario" type="submit">Crear escuadra y canal
+                </button>
+                <p class="escuadrones__nota">Se espera que en los canales se fomente el respeto, recuerda cuidar tu honor.</p>
+            </form>
+        </section>
+
+    </main>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
+
+<!--
+<section class="escuadrones__panel escuadrones__crear">
+                <div class="escuadrones__panel-titulo">
+                    <div>
+                        <h3 id="crear-titulo">Crea una escuadra</h3>
+                        <p>Publica tu plan y que se sumen.</p>
+                    </div>
+                </div>
+                <form class="escuadrones__form">
+                    <div class="escuadrones__campo">
+                        <label for="nombre-escuadron">Nombre de la escuadra</label>
+                        <input id="nombre-escuadron" name="nombre" type="text" maxlength="32" placeholder="Ej. Los del último círculo" required>
+                    </div>
+                    <div class="escuadrones__campo">
+                        <label for="juego-escuadron">¿A qué jugamos?</label>
+                        <select id="juego-escuadron" name="juego" required>
+                            <option value="Apex Legends">Apex Legends</option>
+                            <option value="Valorant">Valorant</option>
+                            <option value="Fortnite">Fortnite</option>
+                            <option value="Minecraft">Minecraft</option>
+                        </select>
+                    </div>
+                    <div class="escuadrones__form-fila">
+                        <div class="escuadrones__campo">
+                            <label for="plataforma">Plataforma</label>
+                            <select id="plataforma" name="plataforma">
+                                <option>PC</option>
+                                <option>PlayStation</option>
+                                <option>Xbox</option>
+                                <option>Nintendo Switch</option>
+                                <option>Cualquiera</option>
+                            </select>
+                        </div>
+                        <div class="escuadrones__campo">
+                            <label for="cupo">Cupo total</label>
+                            <select id="cupo" name="cupo">
+                                <option value="2">2 jugadores</option>
+                                <option value="3">3 jugadores</option>
+                                <option value="4" selected>4 jugadores</option>
+                                <option value="5">5 jugadores</option>
+                                <option value="8">8 jugadores</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="escuadrones__campo">
+                        <label for="duracion">¿Cuánto dura el plan?</label>
+                        <select id="duracion" name="duracion">
+                            <option value="1 hora">1 hora</option>
+                            <option value="2 horas" selected>2 horas</option>
+                            <option value="Esta noche">Esta noche</option>
+                        </select>
+                    </div>
+                    <div class="escuadrones__campo">
+                        <label for="descripcion">¿Qué buscamos? <span>(opcional)</span></label>
+                        <textarea id="descripcion" name="descripcion" rows="3" maxlength="110" placeholder="Modo de juego, nivel, si usamos micrófono..."></textarea>
+                    </div>
+                    <button class="escuadrones__boton escuadrones__boton--primario" type="button">Crear escuadra y canal </button>
+                    <p class="escuadrones__nota">El canal se habilitará cuando conectemos esta página con el servidor.</p>
+                </form>
+            </section>
+-->
+
+<!--
+<section class="escuadrones__panel escuadrones__canal">
+                <div class="escuadrones__canal-cabecera">
+                    <div>
+                        <p class="escuadrones__eyebrow">Vista previa</p>
+                        <h3 id="canal-titulo">Canal de escuadra</h3>
+                    </div>
+                    <span class="escuadrones__canal-juego">Apex Legends</span>
+                </div>
+                <div class="escuadrones__chat">
+                    <p class="escuadrones__chat-fecha">Hoy · El canal se cierra al terminar la sesión</p>
+                    <div class="escuadrones__mensaje-chat">
+                        <span class="escuadrones__avatar escuadrones__avatar--rosa">L</span>
+                        <div><strong>luna.gg <span>· 20:14</span></strong><p>¡Ya estamos listos! ¿Quién se apunta?</p></div>
+                    </div>
+                    <div class="escuadrones__mensaje-chat">
+                        <span class="escuadrones__avatar escuadrones__avatar--cyan">R</span>
+                        <div><strong>Rafita <span>· 20:16</span></strong><p>Yo voy, main support 🙌</p></div>
+                    </div>
+                    <div class="escuadrones__mensaje-chat">
+                        <span class="escuadrones__avatar escuadrones__avatar--morado">T</span>
+                        <div><strong>tavo.exe <span>· 20:18</span></strong><p>Perfecto. ¿Jugamos ranked?</p></div>
+                    </div>
+                </div>
+                <div class="escuadrones__chat-input">
+                    <label class="sr-only" for="mensaje-chat">Escribe un mensaje</label>
+                    <input id="mensaje-chat" type="text" placeholder="Únete a una escuadra para chatear" disabled>
+                    <button type="button" disabled>↑</button>
+                </div>
+            </section>
+        </div>
+        <p class="escuadrones__aclaracion">Vista de ejemplo: crear escuadras, filtros, unirse y chatear estarán disponibles al conectar la página con el servidor.</p>
+-->

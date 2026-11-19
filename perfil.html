@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <link rel="preload" href="css/style.css" as="style">
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>Gamerbook</title>
+</head>
+<body>
+    <header class="barra-superior">
+        
+        <div class="barra-superior__busqueda">
+            <a href="perfil.html"><h1>GB</h1></a>
+            <input type="text" placeholder="buscar en gamerbook">
+        </div>
+
+        <nav class="barra-superior__nav">
+            <a href="muro.html">Muro</a>
+            <a href="tienda.html">Tienda</a>
+            <a href="escuadrones.html">Escuadrones</a>
+            <a href="perfil.html" class="activo">Perfil</a>
+        </nav>
+
+        <div class="barra-superior__botones">
+            <button id="boton-mensaje">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff" class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                </svg>
+            </button>
+            <button>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff" class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                </svg>
+            </button>
+            <button id="boton-salir">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff" class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+            </button>
+        </div>    
+    </header>
+
+    <main class="perfil contenedor">
+        <section class="perfil__contenido">
+            <div class="perfil__portada">
+
+            </div>
+            <div class="perfil__info contenedor-secundario">
+                <div class="perfil__ima-nom">
+                    <div class="perfil__imagen">
+
+                    </div>
+                    <div class="perfil__estadisticas">
+                        <div class="perfil__nombre-fila">
+                            <h2 class="perfil__nombre"></h2>
+                            <button id="abrir-edicion-perfil" class="perfil__editar" type="button" aria-label="Editar perfil" title="Editar perfil">
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.687a2.25 2.25 0 1 1 3.182 3.182l-1.687 1.687m-3.182-3.182L8.03 13.337a4.5 4.5 0 0 0-1.06 1.747L6 18l2.916-.97a4.5 4.5 0 0 0 1.747-1.06l8.832-8.833m-3.182-3.182 3.182 3.182M19.5 13.5v5.25A2.25 2.25 0 0 1 17.25 21H5.25A2.25 2.25 0 0 1 3 18.75V6.75A2.25 2.25 0 0 1 5.25 4.5H10.5" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="perfil__gamertag"></p>
+                    </div>
+                </div>
+            
+
+                <div class="perfil__numeros">
+                    <div class="perfil__numero">
+                        <h3>Amigos</h3>
+                        <p>0</p>
+                    </div>
+                    <div class="perfil__numero">
+                        <h3>Juegos</h3>
+                        <p>0</p>
+                    </div>
+                    <div class="perfil__numero">
+                        <h3>Honor</h3>
+                        <p>0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="contenedor-posts contenedor-secundario">
+            <section class="posts"></section>
+            <aside class="videojuegos"></aside>
+        </section>
+    </main>
+
+    <dialog id="modal-editar-perfil" class="modal-editar-perfil" aria-labelledby="modal-editar-perfil-titulo">
+        <div class="modal-editar-perfil__contenido">
+            <header class="modal-editar-perfil__cabecera">
+                <h2 id="modal-editar-perfil-titulo">Editar perfil</h2>
+                <button id="cerrar-edicion-perfil" type="button" aria-label="Cerrar formulario">×</button>
+            </header>
+            <form class="modal-editar-perfil__formulario">
+                <input type="hidden" name="apellido">
+                <div class="modal-editar-perfil__campo">
+                    <label for="editar-nombre">Nombre</label>
+                    <input id="editar-nombre" name="nombre" type="text">
+                </div>
+                <div class="modal-editar-perfil__campo">
+                    <label for="editar-gamertag">Gamertag</label>
+                    <input id="editar-gamertag" name="gamertag" type="text">
+                </div>
+                <div class="modal-editar-perfil__campo modal-editar-perfil__campo--completo">
+                    <label for="editar-biografia">Biografía</label>
+                    <textarea id="editar-biografia" name="biografia" rows="3" placeholder="Cuéntales algo sobre ti"></textarea>
+                </div>
+                <div class="modal-editar-perfil__campo">
+                    <label for="editar-foto-perfil">Foto de perfil</label>
+                    <input id="editar-foto-perfil" name="foto_perfil" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+                </div>
+                <div class="modal-editar-perfil__campo">
+                    <label for="editar-portada">Foto de portada</label>
+                    <input id="editar-portada" name="portada" type="file" accept="image/*">
+                </div>
+                <div class="modal-editar-perfil__campo modal-editar-perfil__campo--completo">
+                    <label for="editar-juegos">Juegos favoritos</label>
+                    <div id="editar-juegos" class="modal-editar-perfil__opciones"></div>
+                </div>
+                <div class="modal-editar-perfil__campo modal-editar-perfil__campo--completo">
+                    <label for="editar-juegos-descripcion">¿Por qué te gustan?</label>
+                    <textarea id="editar-juegos-descripcion" name="juego_motivo" rows="3" placeholder="Describe qué te gusta de tus juegos favoritos"></textarea>
+                </div>
+                <div class="modal-editar-perfil__campo">
+                    <label for="editar-plataformas">Plataformas favoritas</label>
+                    <div id="editar-plataformas" class="modal-editar-perfil__opciones"></div>
+                </div>
+                <div class="modal-editar-perfil__acciones">
+                    <button class="boton-global" type="submit">Guardar cambios</button>
+                    <button id="cerrar-formulario-perfil" type="button">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

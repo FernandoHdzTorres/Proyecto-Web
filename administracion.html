@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Administración · Gamerbook</title>
+</head>
+<body>
+    <header class="barra-superior">
+        <div class="barra-superior__busqueda">
+            <a href="perfil.html"><h1>GB</h1></a>
+        </div>
+        <nav class="barra-superior__nav">
+            <a href="muro.html">Muro</a>
+            <a href="tienda.html">Tienda</a>
+            <a href="escuadrones.html">Escuadrones</a>
+            <a href="perfil.html">Perfil</a>
+        </nav>
+        <div class="barra-superior__botones">
+            <button id="boton-salir" aria-label="Cerrar sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff" class="botonesheader-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="administracion contenedor">
+        <h2>Administración</h2>
+
+        <section class="administracion__seccion">
+            <h3>Cuentas con honor negativo</h3>
+            <div id="lista-cuentas-negativas" class="administracion__lista"></div>
+        </section>
+
+        <section class="administracion__seccion">
+            <h3>Catálogo de juegos</h3>
+            <form id="form-juego" class="administracion__form" enctype="multipart/form-data">
+                <input type="hidden" name="juego_id">
+                <input name="nombre" type="text" maxlength="100" placeholder="Nombre del juego" required>
+                <input name="imagen" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml">
+                <button type="submit">Guardar juego</button>
+                <button id="limpiar-juego" type="button">Limpiar</button>
+            </form>
+            <div id="lista-juegos" class="administracion__catalogo"></div>
+        </section>
+
+        <section class="administracion__seccion">
+            <h3>Catálogo de consolas</h3>
+            <form id="form-plataforma" class="administracion__form" enctype="multipart/form-data">
+                <input type="hidden" name="plataforma_id">
+                <input name="nombre" type="text" maxlength="60" placeholder="Nombre de la consola" required>
+                <input name="imagen" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml">
+                <button type="submit">Guardar consola</button>
+                <button id="limpiar-plataforma" type="button">Limpiar</button>
+            </form>
+            <div id="lista-plataformas" class="administracion__catalogo"></div>
+        </section>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

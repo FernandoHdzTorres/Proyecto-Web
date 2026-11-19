@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <link rel="preload" href="css/style.css" as="style">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Gamerbook</title>
+</head>
+
+<body>
+    <header class="barra-superior">
+        <div class="barra-superior__busqueda">
+            <a href="perfil.html">
+                <h1>GB</h1>
+            </a>
+            <input type="search" placeholder="buscar en gamerbook">
+        </div>
+
+        <nav class="barra-superior__nav">
+            <a href="muro.html">Muro</a>
+            <a href="tienda.html">Tienda</a>
+            <a href="escuadrones.html" class="activo">Escuadrones</a>
+            <a href="perfil.html">Perfil</a>
+        </nav>
+
+        <div class="barra-superior__botones">
+            <button id="boton-mensaje">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff"
+                    class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                </svg>
+            </button>
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff"
+                    class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                </svg>
+            </button>
+            <button id="boton-salir">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#fff"
+                    class="botonesheader-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="escuadrones contenedor">
+        <div class="escuadrones-flag">
+            <section class="escuadrones__intro">
+                <div>
+                    <h2>Arma tu escuadrón</h2>
+                    <p class="escuadrones__bajada">Encuentra gente para esa partida de hoy. Cada escuadra tiene su
+                        propio canal y desaparece cuando termina el plan.</p>
+                </div>
+            </section>
+
+            <div class="escuadrones__layout">
+                <section class="escuadrones__panel escuadrones__explorar">
+                    <div class="escuadrones__explorar-cabecera">
+                        <div>
+                            <p class="escuadrones__eyebrow">Partidas buscando jugadores</p>
+                            <h3 id="explorar-titulo">Únete a una escuadra</h3>
+                        </div>
+                        <span class="escuadrones__contador">3 disponibles</span>
+                    </div>
+                    <div class="escuadrones__filtros-cabecera">
+                        <input id="buscar-escuadron" type="search" placeholder="Buscar por nombre o juego">
+                        <div>
+                            <label class="sr-only" for="filtro-juego">Filtrar por juego</label>
+                            <select id="filtro-juego">
+                                <option value="">Todos los juegos</option>
+                                <option>Apex Legends</option>
+                                <option>Valorant</option>
+                                <option>Fortnite</option>
+                                <option>Minecraft</option>
+                            </select>
+                        </div>
+                        <button id="crear-escuadron"> Crear nuevo escuadron +</button>
+                    </div>
+                    <div class="escuadrones__lista">
+                        <article class="escuadron-card">
+                            <div class="escuadron-card__juego escuadron-card__juego--apex">
+                                <span aria-hidden="true">A</span>
+                            </div>
+                            <div class="escuadron-card__contenido">
+                                <div class="escuadron-card__titulo">
+                                    <div>
+                                        <h4>Los del último círculo</h4>
+                                        <p>Apex Legends <span class="escuadron-card__punto">·</span> PC</p>
+                                    </div>
+                                    <span class="escuadron-card__estado"><span></span> Buscando</span>
+                                </div>
+                                <p class="escuadron-card__descripcion">Ranked tranqui, con micro. ¡Nos falta una
+                                    leyenda!</p>
+                                <div class="escuadron-card__pie">
+                                    <span class="escuadron-card__jugadores">♟ 3/4</span>
+                                    <span class="escuadron-card__duracion">◷ 2 horas</span>
+                                    <button id="boton-unirme" class="escuadrones__boton escuadrones__boton--unirse" type="button">Unirme
+                                        <span aria-hidden="true">→</span></button>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="escuadron-card">
+                            <div class="escuadron-card__juego escuadron-card__juego--valorant">
+                                <span>V</span>
+                            </div>
+                            <div class="escuadron-card__contenido">
+                                <div class="escuadron-card__titulo">
+                                    <div>
+                                        <h4>Una más y nos vamos</h4>
+                                        <p>Valorant <span class="escuadron-card__punto">·</span> PC</p>
+                                    </div>
+                                    <span class="escuadron-card__estado"><span></span> Buscando</span>
+                                </div>
+                                <p class="escuadron-card__descripcion">Unrated para practicar, buena onda y cero
+                                    presión.</p>
+                                <div class="escuadron-card__pie">
+                                    <span class="escuadron-card__jugadores">♟ 3/5</span>
+                                    <span class="escuadron-card__duracion">◷ Esta noche</span>
+                                    <button id="boton-unirme" class="escuadrones__boton escuadrones__boton--unirse" type="button">Unirme
+                                        <span>→</span></button>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="escuadron-card">
+                            <div class="escuadron-card__juego escuadron-card__juego--minecraft">
+                                <span aria-hidden="true">M</span>
+                            </div>
+                            <div class="escuadron-card__contenido">
+                                <div class="escuadron-card__titulo">
+                                    <div>
+                                        <h4>Mina, pica y repite</h4>
+                                        <p>Minecraft <span class="escuadron-card__punto">·</span> Cualquiera</p>
+                                    </div>
+                                    <span class="escuadron-card__estado"><span></span> Buscando</span>
+                                </div>
+                                <p class="escuadron-card__descripcion">Survival cooperativo. Trae tus mejores ideas para
+                                    la base.</p>
+                                <div class="escuadron-card__pie">
+                                    <span class="escuadron-card__jugadores">♟ 2/4</span>
+                                    <span class="escuadron-card__duracion">◷ 2 horas</span>
+                                    <button class="escuadrones__boton escuadrones__boton--unirse" type="button">Unirme
+                                        <span aria-hidden="true">→</span></button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="canal-flag no-mostrar">
+            <section class="escuadrones__panel escuadrones__canal">
+                <div class="escuadrones__canal-cabecera">
+                    <div>
+                        <h3 id="canal-titulo">Canal de escuadra</h3>
+                    </div>
+                    <span class="escuadrones__canal-juego">Apex Legends</span>
+                </div>
+                <div class="escuadrones__chat">
+                    <p class="escuadrones__chat-fecha">Hoy · El canal se cierra al terminar la sesión</p>
+                    <div class="escuadrones__mensaje-chat">
+                        <span class="escuadrones__avatar escuadrones__avatar--rosa">L</span>
+                        <div><strong>luna.gg <span>· 20:14</span></strong>
+                            <p>¡Ya estamos listos! ¿Quién se apunta?</p>
+                        </div>
+                    </div>
+                    <div class="escuadrones__mensaje-chat">
+                        <span class="escuadrones__avatar escuadrones__avatar--cyan">R</span>
+                        <div><strong>Rafita <span>· 20:16</span></strong>
+                            <p>Yo voy, main support</p>
+                        </div>
+                    </div>
+                    <div class="escuadrones__mensaje-chat">
+                        <span class="escuadrones__avatar escuadrones__avatar--morado">T</span>
+                        <div><strong>tavo.exe <span>· 20:18</span></strong>
+                            <p>Perfecto. ¿Jugamos ranked?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="escuadrones__chat-input">
+                    <label class="sr-only" for="mensaje-chat">Escribe un mensaje</label>
+                    <input id="mensaje-chat" type="text" placeholder="Escribe un mensaje">
+                    <button type="button" >↑</button>
+                </div>
+                <button id="boton-aband-esc" class="boton-abandonar-escuadron boton-global">Abandonar escuadrón</button>
+            </section>
+        </div>
+    </main>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
