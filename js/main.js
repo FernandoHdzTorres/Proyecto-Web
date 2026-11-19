@@ -85,8 +85,11 @@ const aplicarImagenPerfil = (perfil, incluirPerfilCompleto = false) => {
         if (portada)
         {
             portada.style.backgroundImage = perfil.url_portada ? `url("${encodeURI(perfil.url_portada)}")` : "";
-            portada.classList.remove("perfil__portada");
-            portada.classList.add("perfil__portada-act");
+            if(perfil.url_portada)
+            {
+                portada.classList.remove("perfil__portada");
+                portada.classList.add("perfil__portada-act");
+            }
         } 
         if (avatarPerfil) avatarPerfil.style.backgroundImage = perfil.url_avatar ? `url("${encodeURI(perfil.url_avatar)}")` : "";
     }
