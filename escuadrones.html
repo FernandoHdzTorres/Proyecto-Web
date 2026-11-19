@@ -68,6 +68,31 @@
             </section>
 
             <div class="escuadrones__layout">
+                <section class="escuadrones__panel escuadrones__explorar">
+                    <div class="escuadrones__explorar-cabecera">
+                        <div>
+                            <p class="escuadrones__eyebrow">Partidas buscando jugadores</p>
+                            <h3 id="explorar-titulo">Únete a una escuadra</h3>
+                        </div>
+                        <span class="escuadrones__contador"></span>
+                    </div>
+                    <div class="escuadrones__filtros-cabecera">
+                        <input id="buscar-escuadron" type="search" placeholder="Buscar por nombre o juego">
+                        <div>
+                            <label class="sr-only" for="filtro-juego">Filtrar por juego</label>
+                            <select id="filtro-juego">
+                                <option value="">Todos los juegos</option>
+                                <option>Apex Legends</option>
+                                <option>Valorant</option>
+                                <option>Fortnite</option>
+                                <option>Minecraft</option>
+                            </select>
+                        </div>
+                        <button id="crear-escuadron"> Crear nuevo escuadron +</button>
+                    </div>
+                    <div class="escuadrones__lista">
+                    </div>
+                </section>
             </div>
         </div>
 
