@@ -1,10 +1,10 @@
 <?php
 
-$host     = getenv('MYSQLHOST')     ?: ($_ENV['MYSQLHOST']     ?? ($_SERVER['MYSQLHOST']     ?? 'localhost'));
-$dbname   = getenv('MYSQLDATABASE') ?: ($_ENV['MYSQLDATABASE'] ?? ($_SERVER['MYSQLDATABASE'] ?? 'gamerbook'));
-$username = getenv('MYSQLUSER')     ?: ($_ENV['MYSQLUSER']     ?? ($_SERVER['MYSQLUSER']     ?? 'root'));
-$password = getenv('MYSQLPASSWORD') ?: ($_ENV['MYSQLPASSWORD'] ?? ($_SERVER['MYSQLPASSWORD'] ?? 'root'));
-$port     = getenv('MYSQLPORT')     ?: ($_ENV['MYSQLPORT']     ?? ($_SERVER['MYSQLPORT']     ?? '8889'));
+$host     = getenv('MYSQLHOST') ?: 'localhost';
+$dbname   = getenv('MYSQLDATABASE') ?: 'gamerbook';
+$username = getenv('MYSQLUSER') ?: 'root';
+$password = getenv('MYSQLPASSWORD') ?: 'root';
+$port     = getenv('MYSQLPORT') ?: '8889';
 $charset = 'utf8mb4';
 $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=$charset";
 
